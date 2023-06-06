@@ -1,6 +1,6 @@
 /* ============================================================================================
  * Program: main.do
- * Data:	workingdata/data.dta
+ * Data:    workingdata/data.dta
  * Aim:     all results
  * Revised: 5/22/2023
  * =========================================================================================== */
@@ -14,21 +14,10 @@ cd "D:\data&code"
 *                             settings                              *
 *-------------------------------------------------------------------*
 * evm
-	use workingdata/wdata, clear
 	global evm evm
 	global treat treat
 	global evm1 evm_1
 	global evm2 evm_2
-		* 新建一个变量，使得第一期evm = 0, 之前为-1，-2...，之后为1，2...
-		by id: gen fz1 = $evm - $evm[_n-1]
-		gen fz2 = (fz1 == 1)*year
-		rangestat (max) fz2, interval(year . .) by(id)
-		rename fz2_max startyr
-		replace startyr = . if startyr == 0
-		drop fz1 fz2
-		gen policy = year - startyr
-		replace policy = . if startyr == 0 | mi($evm)
-	save workingdata\did_data, replace
 
 * y ln value
 	global y1 lpm25

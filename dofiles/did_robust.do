@@ -26,56 +26,55 @@ xtset id year
 
 // Omitted Variable Test: city level
 * Panel A: Experienced
-	gen evm_envir1 = (envir_capacity_v1 == 1 & $evm == 1) if !mi($evm)
 	eststo clear
 	cap drop _est*
-	eststo a1: qui: reghdfe $y1 $evm evm_envir1 $xlist, ab(year id) $cond
-	eststo a3: qui: reghdfe $y3 $evm evm_envir1 $xlist, ab(year id) $cond
-	eststo a4: qui: reghdfe $y4 $evm evm_envir1 $xlist, ab(year id) $cond
+	eststo a1: qui: reghdfe $y1 $evm experienced $xlist, ab(year id) $cond
+	eststo a3: qui: reghdfe $y3 $evm experienced $xlist, ab(year id) $cond
+	eststo a4: qui: reghdfe $y4 $evm experienced $xlist, ab(year id) $cond
 	esttab a* using tables/$result.rtf, append ///
 		scalar(N r2_a) b(%9.3f) ar2(%9.3f) se compress nogap ///
-		keep($evm evm_envir1)  ///
+		keep($evm experienced)  ///
 		star(* 0.1 ** 0.05 *** 0.01) title("Table 5 Panel A")
 
 * Panel B: Promoted
 	eststo clear
 	cap drop _est*
-	eststo a1: qui: reghdfe $y1 $evm evm_pro $xlist, ab(year id) $cond
-	eststo a3: qui: reghdfe $y3 $evm evm_pro $xlist, ab(year id) $cond
-	eststo a4: qui: reghdfe $y4 $evm evm_pro $xlist, ab(year id) $cond
+	eststo a1: qui: reghdfe $y1 $evm promoted $xlist, ab(year id) $cond
+	eststo a3: qui: reghdfe $y3 $evm promoted $xlist, ab(year id) $cond
+	eststo a4: qui: reghdfe $y4 $evm promoted $xlist, ab(year id) $cond
 	esttab a* using tables/$result.rtf, append ///
 		scalar(N r2_a) b(%9.3f) ar2(%9.3f) se compress nogap ///
-		keep($evm evm_pro)  ///
+		keep($evm promoted)  ///
 		star(* 0.1 ** 0.05 *** 0.01) title("Table 5 Panel B")
 
 * Panel C: Familiar
 	gen evm_cwyr_20 = workcitytime >= 20 if !mi(workcitytime)
 	replace evm_cwyr_20 = 0 if (mi(workcitytime) & $evm ==0 ) | (evm_cwyr_20 == 1 & $evm == 0)
-	global evm_cwyr evm_cwyr_20
+	global familiar evm_cwyr_20
 		
 	eststo clear
 	cap drop _est*
-	eststo a1: qui: reghdfe $y1 $evm $evm_cwyr $xlist, ab(year id) $cond
-	eststo a3: qui: reghdfe $y3 $evm $evm_cwyr $xlist, ab(year id) $cond
-	eststo a4: qui: reghdfe $y4 $evm $evm_cwyr $xlist, ab(year id) $cond
+	eststo a1: qui: reghdfe $y1 $evm $familiar $xlist, ab(year id) $cond
+	eststo a3: qui: reghdfe $y3 $evm $familiar $xlist, ab(year id) $cond
+	eststo a4: qui: reghdfe $y4 $evm $familiar $xlist, ab(year id) $cond
 	esttab a* using tables/$result.rtf, append ///
 		scalar(N r2_a) b(%9.3f) ar2(%9.3f) se compress nogap ///
-		keep($evm $evm_cwyr)  ///
+		keep($evm $familiar)  ///
 		star(* 0.1 ** 0.05 *** 0.01) title("Table 5 Panel C")
 ** robustness check for Panel C: Familiar
 foreach v of numlist 5 10 30{
 	gen evm_cwyr_`v' = workcitytime >= `v' if !mi(workcitytime)
 	replace evm_cwyr_`v' = 0 if (mi(workcitytime) & $evm ==0 ) | (evm_cwyr_`v' == 1 & $evm == 0)
-	global evm_cwyr evm_cwyr_`v'
+	global familiar evm_cwyr_`v'
 		
 	eststo clear
 	cap drop _est*
-	eststo a1: qui: reghdfe $y1 $evm $evm_cwyr $xlist, ab(year id) $cond
-	eststo a3: qui: reghdfe $y3 $evm $evm_cwyr $xlist, ab(year id) $cond
-	eststo a4: qui: reghdfe $y4 $evm $evm_cwyr $xlist, ab(year id) $cond
+	eststo a1: qui: reghdfe $y1 $evm $familiar $xlist, ab(year id) $cond
+	eststo a3: qui: reghdfe $y3 $evm $familiar $xlist, ab(year id) $cond
+	eststo a4: qui: reghdfe $y4 $evm $familiar $xlist, ab(year id) $cond
 	esttab a* using tables/$result.rtf, append ///
 		scalar(N r2_a) b(%9.3f) ar2(%9.3f) se compress nogap ///
-		keep($evm $evm_cwyr)  ///
+		keep($evm $familiar)  ///
 		star(* 0.1 ** 0.05 *** 0.01) title("Table A2")
 }
 
@@ -87,25 +86,25 @@ forvalues n = 5(1)10{
 	keep if sss <= `n'
 	collapse (mean) pm25, by(city year)
 	replace pm25 = ln(pm25)
-	rename pm25 sur_lpm25_`n'
-	save tempdata/sur_lpm25_`n', replace
+	rename pm25 avg_`n'neighb_pm25
+	save tempdata/avg_`n'neighb_pm25, replace
 	
 	use workingdata/did_data, clear
-	merge 1:1 city year using tempdata/sur_lpm25_`n'
+	merge 1:1 city year using tempdata/avg_`n'neighb_pm25
 	drop if _m == 2
 	drop _m
 
 	xtset id year
-	eststo a`n': qui: reghdfe $y1 $evm sur_lpm25_`n' $xlist, ab(year id) $cond
+	eststo a`n': qui: reghdfe $y1 $evm avg_`n'neighb_pm25 $xlist, ab(year id) $cond
 }
 	esttab a5 a10 using tables/$result.rtf, append ///
 		scalar(N r2_a) b(%9.3f) ar2(%9.3f) se compress nogap ///
-		keep($evm sur_lpm25*) ///
+		keep($evm avg_*) ///
 		star(* 0.1 ** 0.05 *** 0.01) title("Table 5 panel D")
 ** robustness check for Panel D
 	esttab a6 a7 a8 a9 using tables/$result.rtf, append ///
 		scalar(N r2_a) b(%9.3f) ar2(%9.3f) se compress nogap ///
-		keep($evm sur_lpm25*) ///
+		keep($evm avg_*) ///
 		star(* 0.1 ** 0.05 *** 0.01) title("Table A3")
 		
 

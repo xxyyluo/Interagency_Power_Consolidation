@@ -1,8 +1,8 @@
 /* ============================================================================================
  * Program: main.do
- * Data:    workingdata/data.dta
+ * Data:    workingdata/did_data.dta
  * Aim:     all results
- * Revised: 5/22/2023
+ * Revised: 6/22/2023
  * =========================================================================================== */
 clear
 clear matrix
@@ -25,16 +25,11 @@ cd "D:\data&code"
 	global y4 leffluentpc
 
 *------------------------------------controls----------------------------------
-	global struc struc_add
 	global wage lwage_add
-	global popden lpopden
-	global gdp lgdppc
-	global gdp2 lgdppc2
-	global open open_add
-	global fiscal fiscal_add
-	global sales sales_add
+	global pop lpopden
+	global gdppc lgdppcraw
 
-	global xlist lgdppcraw gdpgr $struc $popden $open city_news tem tem2 rain
+	global xlist $gdppc gdpgr struc $pop open city_news temp temp2 precip
 *-------------------------------------------------------------------------------
 
 *** vce

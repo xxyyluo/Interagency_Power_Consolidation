@@ -1,8 +1,8 @@
 /* ============================================================================================
  * Program: did_robust.do
- * Data:	workingdata/did_data.dta
+ * Data:    workingdata/did_data.dta
  * Aim:     robustness check
- * Revised: 5/22/2023
+ * Revised: 6/22/2023
  * =========================================================================================== */
 use workingdata/did_data, clear
 xtset id year
